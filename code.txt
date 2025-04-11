@@ -1,0 +1,75 @@
+<? php
+// Original code copied from w3schools.
+// Adapted for CST8805 project by Yvan Perron November 27, 2021
+//Do not change any of the code below this line and up to the "End of do not modify comment below"
+$target_dir = "uploads/";
+$target_file = $target_dir . basename($_FILES["fileToUpload" ] ["name" ]);
+$target_filesig = $target_dir . basename ($_FILES["fileToUploadSig"] ["name" ]) ;
+$target_fileX509 = $target_dir . basename($_FILES["fileToUploadX509"] ["name" ]);
+ 
+$uploadok = 1;
+ 
+// Check if file already exists
+//if (file_exists($target_file) | | file_exists($target_filesig) | | file_exists($target_fileX509) ) {
+// echo " <p>Files already exists - they will be overwritten. </p> ";
+// //$uploadOk = 0;
+ 
+echo " <p style='color:blue; font-size: 1.5em; '> File Upload Results</p> ";
+ 
+// Check file size
+if ($ FILES["fileToUpload" ] ["size"] > 500000) {
+echo "&nbsp &nbsp &nbsp Sorry, your file is too large. ";
+$uploadok = 0;
+ 
+}
+ 
+// Check if $uploadok is set to 0 by an error
+if ($uploadok == 0) {
+echo "&nbsp &nbsp &nbsp Sorry, your file was not uploaded. ";
+// if everything is ok, try to upload file
+path to payroll signature file
+path to payroll file
+path to signer's x509 certificate
+path to signer's public key
+ 
+Z
+ 
+} else {
+if (move_uploaded_file($_FILES["fileToUpload" ] ["tmp_name"], $target_file) && move_uploaded_file($_FILES["fileToUploadSig"] ["tmp_name"], $target_fileSig) &&
+move_uploaded_file($_FILES["fileToUploadX509"] ["tmp_name" ], $target_fileX509) ) {
+echo "The file ". htmlspecialchars ( basename( $_FILES["fileToUpload"] ["name" ] ) ) . " and its digital signature have been uploaded. <br>";
+echo "&nbsp &nbsp &nbsp Files successfully uploaded to Bank Payroll Application <br>";
+} else {
+echo "&nbsp &nbsp &nbsp Sorry, there was an error uploading your file. ";
+$uploadok = 0;
+ 
+//End of do NOT modify any of the code above this line
+ 
+//The code below this line is student customizable
+//Important variables declaration
+$target filesig
+$target_file
+$target fileX509
+$target_filePub
+ 
+$target_filePubKey = $target_fileX509 . "_Pub.pem";
+ 
+/Sample code - Signature Validation via OpenSSL command shell
+//The sample code below SIMPLY verifies that the signature validates with the signer's public key. It also assumes that the signature was prouduced using the sha256 hash
+algorithm
+//IT DOES NOT verify the signer's certificate:
+// 1) status at the time the signature was generated
+// 2) was active and not expired at the time of the signature was generated
+3) was authorized for digital signatures/non-repudiation
+4) is issued by a trusted Certificate Authority (CA)
+if ($uploadok !== 0) {
+//The openssl x509 command simply extracts the public key from the X509 certificate
+//IT DOES NOT validate that the X509 certificate containing the public key is valid
+$cmd = "openssl x509 -inform pem -in $target_fileX509 -pubkey -out $target_filePubKey";
+$valRes = exec( $cmd ) ;
+$cmd = "openssl dgst -sha256 -verify $target_filePubKey -signature $target_filesig $target_file ";
+echo " <p style='color:blue; font-size: 1.5em; '> Payroll Signature Validation Results via shell_exec() method</p> ";
+$valRes = shell_exec( $cmd . " 2>&1");
+echo "&nbsp &nbsp &nbsp $valRes";
+}
+?>
